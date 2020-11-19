@@ -17,7 +17,7 @@ namespace TAO_JSON_PEGTL_NAMESPACE::internal
    [[nodiscard]] inline std::FILE* file_open( const std::filesystem::path& path )
    {
       errno = 0;
-#if defined( _MSC_VER )
+#if defined( _MSC_VER ) || defined( __MINGW32__ )
       std::FILE* file;
       if( ::_wfopen_s( &file, path.c_str(), L"rb" ) == 0 ) {
          return file;
@@ -25,11 +25,7 @@ namespace TAO_JSON_PEGTL_NAMESPACE::internal
       const std::error_code ec( errno, std::system_category() );
       throw std::filesystem::filesystem_error( "_wfopen_s() failed", path, ec );
 #else
-#if defined( __MINGW32__ )
-      if( auto* file = std::fopen( path.c_str(), "rb" ) )
-#else
       if( auto* file = std::fopen( path.c_str(), "rbe" ) )
-#endif
       {
          return file;
       }
